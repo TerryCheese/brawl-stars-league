@@ -27,7 +27,7 @@
 <body>
 
     <h1>🌟 荒野亂鬥 互動聯賽 🌟</h1>
-    <div class="instructions">地圖由系統根據對戰組合自動鎖定生成。主辦方更新晉級名單後，網頁將自動排定下一輪地圖。</div>
+    <div class="instructions">地圖由系統根據對戰組合自動鎖定生成。<br>目前使用：最新官方排位賽地圖池 (Ranked Map Pool)</div>
 
     <div class="matches-container" id="matchesContainer"></div>
 
@@ -36,10 +36,11 @@
         // 如果你希望「所有地圖重新洗牌」，只要把這個數字改掉（例如改成 2, 3, 4...）
         const leagueSeed = 1; 
 
+        // 【更新】這裡已經改成只剩排位賽專用的 3 張圖
         const mapPool = {
-            brawlBall: ["Super Beach (超級海灘)", "Pinhole Punt (穿心暗箭)", "Sneaky Fields (隱蔽球場)", "Backyard Bowl (後院球場)", "Center Stage (中心舞台)", "Triple Dribble (三重盤帶)"],
-            gemGrab: ["Hard Rock Mine (硬石礦坑)", "Double Swoosh (雙重連擊)", "Deathcap Trap (毒蘑菇陷阱)", "Crystal Arcade (水晶機台)", "Undermine (深淵礦坑)", "Minecart Madness (瘋狂礦車)"],
-            bounty: ["Shooting Star (流星突襲)", "Hideout (藏身處)", "Layer Cake (夾心蛋糕)", "Canal Grande (大運河)", "Dry Season (旱季)", "Excel (卓越)"]
+            brawlBall: ["Super Beach (超級海灘)", "Pinhole Punt (穿心暗箭)", "Sneaky Fields (隱蔽球場)"],
+            gemGrab: ["Hard Rock Mine (硬石礦坑)", "Double Swoosh (雙重連擊)", "Deathcap Trap (毒蘑菇陷阱)"],
+            bounty: ["Shooting Star (流星突襲)", "Hideout (藏身處)", "Layer Cake (夾心蛋糕)"]
         };
 
         // 【主辦方賽程表】晉級後，把 TBD 改成隊伍名稱即可
