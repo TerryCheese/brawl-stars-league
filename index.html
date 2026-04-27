@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>荒野亂鬥 互動聯賽</title>
+    <title>荒野亂鬥 互動聯賽 - 足球專場</title>
     <style>
-        :root { --bg-color: #1a1b26; --card-bg: #24283b; --text-main: #c0caf5; --text-title: #ff9e64; --border-color: #414868; --brawl-ball: #7aa2f7; --gem-grab: #bb9af7; --bounty: #f7768e; }
+        :root { --bg-color: #1a1b26; --card-bg: #24283b; --text-main: #c0caf5; --text-title: #ff9e64; --border-color: #414868; --brawl-ball: #7aa2f7; }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
         h1 { color: var(--text-title); text-align: center; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
-        .instructions { background: rgba(255,255,255,0.1); padding: 10px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-size: 0.9em; }
+        .instructions { background: rgba(255,255,255,0.1); padding: 10px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-size: 0.9em; line-height: 1.5; }
         .matches-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; width: 100%; max-width: 1200px; margin-top: 10px; }
         .match-card { background-color: var(--card-bg); border: 2px solid var(--border-color); border-radius: 12px; padding: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
         .match-title { text-align: center; font-weight: bold; font-size: 1.1em; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color); }
@@ -18,8 +18,6 @@
         .maps { display: flex; flex-direction: column; gap: 8px; }
         .map-item { display: flex; justify-content: space-between; background: rgba(0,0,0,0.2); padding: 8px 12px; border-radius: 6px; }
         .mode-bb { color: var(--brawl-ball); font-weight: bold; }
-        .mode-gg { color: var(--gem-grab); font-weight: bold; }
-        .mode-bt { color: var(--bounty); font-weight: bold; }
         .map-name { color: #fff; }
         .tbd-msg { text-align:center; color:#888; font-style: italic; }
     </style>
@@ -27,7 +25,11 @@
 <body>
 
     <h1>🌟 荒野亂鬥 互動聯賽 🌟</h1>
-    <div class="instructions">地圖由系統根據對戰組合自動鎖定生成。<br>目前使用：最新官方排位賽地圖池 (Ranked Map Pool)</div>
+    <div class="instructions">
+        🏆 <b>本次賽事為「亂鬥足球」專場</b> 🏆<br>
+        地圖由系統根據對戰組合自動鎖定生成出場順序。<br>
+        目前使用：最新官方排位賽地圖池 (Ranked Map Pool)
+    </div>
 
     <div class="matches-container" id="matchesContainer"></div>
 
@@ -36,12 +38,8 @@
         // 如果你希望「所有地圖重新洗牌」，只要把這個數字改掉（例如改成 2, 3, 4...）
         const leagueSeed = 1; 
 
-        // 【更新】這裡已經改成只剩排位賽專用的 3 張圖
-        const mapPool = {
-            brawlBall: ["Super Beach (超級海灘)", "Pinhole Punt (穿心暗箭)", "Sneaky Fields (隱蔽球場)"],
-            gemGrab: ["Hard Rock Mine (硬石礦坑)", "Double Swoosh (雙重連擊)", "Deathcap Trap (毒蘑菇陷阱)"],
-            bounty: ["Shooting Star (流星突襲)", "Hideout (藏身處)", "Layer Cake (夾心蛋糕)"]
-        };
+        // 足球排位賽圖池 (共3張)
+        const bbPool = ["Super Beach (超級海灘)", "Pinhole Punt (穿心暗箭)", "Sneaky Fields (隱蔽球場)"];
 
         // 【主辦方賽程表】晉級後，把 TBD 改成隊伍名稱即可
         const bracket = [
@@ -78,10 +76,17 @@
             return ((t ^ t >>> 14) >>> 0) / 4294967296;
         }
 
-        // 從陣列中根據 seed 穩定選出一個地圖
-        function getMapFromSeed(modeArray, seedValue) {
-            const index = Math.floor(seededRandom(seedValue) * modeArray.length);
-            return modeArray[index];
+        // 根據 seed 將 3 張地圖隨機排序 (用於 BO3)
+        function getShuffledBBMaps(seedValue) {
+            let pool = [...bbPool];
+            let result = [];
+            for(let i = 0; i < 3; i++) {
+                // 利用加上 i 來確保每局抽的結果不同
+                let idx = Math.floor(seededRandom(seedValue + i.toString()) * pool.length);
+                result.push(pool[idx]);
+                pool.splice(idx, 1); // 抽過的移出池子，保證 3 局地圖不重複
+            }
+            return result;
         }
 
         function renderBracket() {
@@ -93,25 +98,26 @@
                 
                 // 判斷狀態
                 if (match.t1 === "TBD" || match.t2 === "TBD") {
-                    mapHTML = `<div class="tbd-msg">等待隊伍晉級後，自動解鎖地圖</div>`;
+                    mapHTML = `<div class="tbd-msg">等待隊伍晉級後，自動解鎖地圖順序</div>`;
                 } else if (match.t2.includes("BYE") || match.t1.includes("BYE")) {
                     mapHTML = `<div style="text-align:center; color:#ff9e64;">此局直接晉級，無需比賽</div>`;
                 } else {
                     // 根據對戰組合名稱產生唯一的 Seed 字串
                     const matchSeedStr = match.id + match.t1 + match.t2 + leagueSeed;
+                    const bo3Maps = getShuffledBBMaps(matchSeedStr);
                     
                     mapHTML = `
                         <div class="map-item">
-                            <span class="mode-bb">⚽ 亂鬥足球</span>
-                            <span class="map-name">${getMapFromSeed(mapPool.brawlBall, matchSeedStr + "bb")}</span>
+                            <span class="mode-bb">⚽ 第 1 局</span>
+                            <span class="map-name">${bo3Maps[0]}</span>
                         </div>
                         <div class="map-item">
-                            <span class="mode-gg">💎 寶石爭奪戰</span>
-                            <span class="map-name">${getMapFromSeed(mapPool.gemGrab, matchSeedStr + "gg")}</span>
+                            <span class="mode-bb">⚽ 第 2 局</span>
+                            <span class="map-name">${bo3Maps[1]}</span>
                         </div>
                         <div class="map-item">
-                            <span class="mode-bt">⭐ 搶星大戰</span>
-                            <span class="map-name">${getMapFromSeed(mapPool.bounty, matchSeedStr + "bt")}</span>
+                            <span class="mode-bb">⚽ 第 3 局</span>
+                            <span class="map-name">${bo3Maps[2]}</span>
                         </div>
                     `;
                 }
