@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>荒野亂鬥 互動聯賽 - 足球專場</title>
+    <title>荒野亂鬥 互動聯賽 - 足球一局定勝負</title>
     <style>
         :root { --bg-color: #1a1b26; --card-bg: #24283b; --text-main: #c0caf5; --text-title: #ff9e64; --border-color: #414868; --brawl-ball: #7aa2f7; }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
@@ -26,16 +26,14 @@
 
     <h1>🌟 荒野亂鬥 互動聯賽 🌟</h1>
     <div class="instructions">
-        🏆 <b>本次賽事為「亂鬥足球」專場</b> 🏆<br>
-        地圖由系統根據對戰組合自動鎖定生成出場順序。<br>
-        目前使用：最新官方排位賽地圖池 (Ranked Map Pool)
+        🏆 <b>本次賽事為「亂鬥足球」一局定勝負</b> 🏆<br>
+        系統將為每組對戰隨機抽出一張官方排位賽足球地圖
     </div>
 
     <div class="matches-container" id="matchesContainer"></div>
 
     <script>
-        // 【主辦方控制台】
-        // 如果你希望「所有地圖重新洗牌」，只要把這個數字改掉（例如改成 2, 3, 4...）
+        // 【主辦方控制台】修改這個數字可以重新洗牌所有地圖
         const leagueSeed = 1; 
 
         // 足球排位賽圖池 (共3張)
@@ -53,7 +51,7 @@
             { id: "16強賽 - M7", t1: "稟恩微女友", t2: "對乙醯氨基酚" },
             { id: "16強賽 - M8", t1: "庫里就是屌", t2: "輪空 (BYE)" },
             
-            // 8強 (晉級後在此修改)
+            // 8強
             { id: "8強賽 - M1", t1: "TBD", t2: "TBD" },
             { id: "8強賽 - M2", t1: "TBD", t2: "TBD" },
             { id: "8強賽 - M3", t1: "TBD", t2: "TBD" },
@@ -76,17 +74,10 @@
             return ((t ^ t >>> 14) >>> 0) / 4294967296;
         }
 
-        // 根據 seed 將 3 張地圖隨機排序 (用於 BO3)
-        function getShuffledBBMaps(seedValue) {
-            let pool = [...bbPool];
-            let result = [];
-            for(let i = 0; i < 3; i++) {
-                // 利用加上 i 來確保每局抽的結果不同
-                let idx = Math.floor(seededRandom(seedValue + i.toString()) * pool.length);
-                result.push(pool[idx]);
-                pool.splice(idx, 1); // 抽過的移出池子，保證 3 局地圖不重複
-            }
-            return result;
+        // 從陣列中根據 seed 穩定選出一個地圖
+        function getMapFromSeed(modeArray, seedValue) {
+            const index = Math.floor(seededRandom(seedValue) * modeArray.length);
+            return modeArray[index];
         }
 
         function renderBracket() {
@@ -98,26 +89,17 @@
                 
                 // 判斷狀態
                 if (match.t1 === "TBD" || match.t2 === "TBD") {
-                    mapHTML = `<div class="tbd-msg">等待隊伍晉級後，自動解鎖地圖順序</div>`;
+                    mapHTML = `<div class="tbd-msg">等待隊伍晉級後，自動解鎖地圖</div>`;
                 } else if (match.t2.includes("BYE") || match.t1.includes("BYE")) {
                     mapHTML = `<div style="text-align:center; color:#ff9e64;">此局直接晉級，無需比賽</div>`;
                 } else {
                     // 根據對戰組合名稱產生唯一的 Seed 字串
                     const matchSeedStr = match.id + match.t1 + match.t2 + leagueSeed;
-                    const bo3Maps = getShuffledBBMaps(matchSeedStr);
                     
                     mapHTML = `
                         <div class="map-item">
-                            <span class="mode-bb">⚽ 第 1 局</span>
-                            <span class="map-name">${bo3Maps[0]}</span>
-                        </div>
-                        <div class="map-item">
-                            <span class="mode-bb">⚽ 第 2 局</span>
-                            <span class="map-name">${bo3Maps[1]}</span>
-                        </div>
-                        <div class="map-item">
-                            <span class="mode-bb">⚽ 第 3 局</span>
-                            <span class="map-name">${bo3Maps[2]}</span>
+                            <span class="mode-bb">⚽ 戰場地圖</span>
+                            <span class="map-name">${getMapFromSeed(bbPool, matchSeedStr)}</span>
                         </div>
                     `;
                 }
