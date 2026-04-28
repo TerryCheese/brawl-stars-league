@@ -41,6 +41,7 @@
         .mode-gg { color: var(--gem-grab); }
         .mode-bt { color: var(--bounty); }
         .map-name { color: #fff; font-size: 1.05em; font-weight: 500; }
+        .map-self-pick { color: #9aa5ce; font-size: 0.9em; font-style: italic; }
         .tbd-msg { text-align:center; color:#888; font-style: italic; padding: 10px; }
     </style>
 </head>
@@ -51,7 +52,8 @@
     <div class="instructions">
         🏆 <b>本屆賽事對戰規則</b> 🏆<br>
         對戰採 <b>三戰兩勝制 (BO3)</b>。雙方隊伍將依序進行「足球」、「寶石」與「搶星」三個模式。<br>
-        每局單一模式皆採「<b>星光戰</b>」賽制，各局指定戰場將由系統從下方地圖池中自動抽籤決定！
+        每局單一模式皆採「<b>星光戰</b>」賽制。<br>
+        <b>第 1 局 (足球) 由系統隨機抽圖，第 2 局與第 3 局由雙方自行從圖池中選圖。</b>
     </div>
 
     <div class="map-pool-reference">
@@ -78,13 +80,11 @@
     <div class="matches-container" id="matchesContainer"></div>
 
     <script>
-        // 【主辦方控制台】修改這個數字可以重新洗牌所有地圖
+        // 【主辦方控制台】修改這個數字可以重新洗牌第一局的地圖
         const leagueSeed = 1; 
 
-        // 各模式排位賽圖池 (對戰隨機抽取範圍)
+        // 足球排位賽圖池 (首局隨機抽取範圍)
         const bbPool = ["夢幻彈珠", "中心舞台", "三重威脅"];
-        const ggPool = ["咻咻作響", "寶石要塞", "地下礦坑"];
-        const btPool = ["草叢迷蹤", "酷熱地帶", "神秘流星"];
 
         // 【主辦方賽程表】晉級後，把 TBD 改成隊伍名稱即可
         const bracket = [
@@ -143,15 +143,15 @@
                     mapHTML = `
                         <div class="map-item">
                             <span class="mode-label mode-bb">⚽ 第1局 (足球)</span>
-                            <span class="map-name">${getMapFromSeed(bbPool, matchSeedStr + "bb")}</span>
+                            <span class="map-name">${getMapFromSeed(bbPool, matchSeedStr)}</span>
                         </div>
                         <div class="map-item">
                             <span class="mode-label mode-gg">💎 第2局 (寶石)</span>
-                            <span class="map-name">${getMapFromSeed(ggPool, matchSeedStr + "gg")}</span>
+                            <span class="map-self-pick">(從圖池自行選圖)</span>
                         </div>
                         <div class="map-item">
                             <span class="mode-label mode-bt">⭐ 第3局 (搶星)</span>
-                            <span class="map-name">${getMapFromSeed(btPool, matchSeedStr + "bt")}</span>
+                            <span class="map-self-pick">(從圖池自行選圖)</span>
                         </div>
                     `;
                 }
