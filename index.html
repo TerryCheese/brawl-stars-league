@@ -36,7 +36,10 @@
         
         .maps { display: flex; flex-direction: column; gap: 8px; }
         .map-item { display: flex; justify-content: space-between; background: rgba(0,0,0,0.2); padding: 10px 15px; border-radius: 6px; align-items: center; }
-        .mode-label { color: var(--brawl-ball); font-weight: bold; font-size: 0.9em; }
+        .mode-label { font-weight: bold; font-size: 0.9em; }
+        .mode-bb { color: var(--brawl-ball); }
+        .mode-gg { color: var(--gem-grab); }
+        .mode-bt { color: var(--bounty); }
         .map-name { color: #fff; font-size: 1.05em; font-weight: 500; }
         .tbd-msg { text-align:center; color:#888; font-style: italic; padding: 10px; }
     </style>
@@ -47,13 +50,13 @@
     
     <div class="instructions">
         🏆 <b>本屆賽事對戰規則</b> 🏆<br>
-        對戰組合將由系統自動決定戰場。本次賽事統一使用「<b>亂鬥足球</b>」模式進行一局定勝負。<br>
-        地圖隨機範圍為下方列出之排位賽足球地圖池。
+        對戰採 <b>三戰兩勝制 (BO3)</b>。雙方隊伍將依序進行「足球」、「寶石」與「搶星」三個模式。<br>
+        每局單一模式皆採「<b>星光戰</b>」賽制，各局指定戰場將由系統從下方地圖池中自動抽籤決定！
     </div>
 
     <div class="map-pool-reference">
         <div>
-            <span class="pool-title" style="color: var(--brawl-ball);">⚽ 足球地圖池 (對戰使用)</span>
+            <span class="pool-title" style="color: var(--brawl-ball);">⚽ 足球地圖池</span>
             <div class="pool-item">· 夢幻彈珠</div>
             <div class="pool-item">· 中心舞台</div>
             <div class="pool-item">· 三重威脅</div>
@@ -78,8 +81,10 @@
         // 【主辦方控制台】修改這個數字可以重新洗牌所有地圖
         const leagueSeed = 1; 
 
-        // 足球排位賽圖池 (對戰隨機抽取範圍)
+        // 各模式排位賽圖池 (對戰隨機抽取範圍)
         const bbPool = ["夢幻彈珠", "中心舞台", "三重威脅"];
+        const ggPool = ["咻咻作響", "寶石要塞", "地下礦坑"];
+        const btPool = ["草叢迷蹤", "酷熱地帶", "神秘流星"];
 
         // 【主辦方賽程表】晉級後，把 TBD 改成隊伍名稱即可
         const bracket = [
@@ -137,8 +142,16 @@
                     const matchSeedStr = match.id + match.t1 + match.t2 + leagueSeed;
                     mapHTML = `
                         <div class="map-item">
-                            <span class="mode-label">⚽ 足球</span>
-                            <span class="map-name">${getMapFromSeed(bbPool, matchSeedStr)}</span>
+                            <span class="mode-label mode-bb">⚽ 第1局 (足球)</span>
+                            <span class="map-name">${getMapFromSeed(bbPool, matchSeedStr + "bb")}</span>
+                        </div>
+                        <div class="map-item">
+                            <span class="mode-label mode-gg">💎 第2局 (寶石)</span>
+                            <span class="map-name">${getMapFromSeed(ggPool, matchSeedStr + "gg")}</span>
+                        </div>
+                        <div class="map-item">
+                            <span class="mode-label mode-bt">⭐ 第3局 (搶星)</span>
+                            <span class="map-name">${getMapFromSeed(btPool, matchSeedStr + "bt")}</span>
                         </div>
                     `;
                 }
